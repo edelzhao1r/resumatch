@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from functools import lru_cache
-from typing import Iterable
 
-import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # A small built-in stopword list so we don't require nltk downloads.
 _STOPWORDS = {
@@ -54,41 +53,12 @@ def keyword_coverage(jd_text: str, resume_text: str, top_n: int = 20) -> float:
     return 100.0 * hits / len(most_common)
 
 
-@lru_cache(maxsize=1)
-def _load_word2vec():
-    """Lazy-load a pretrained Word2Vec / GloVe model via gensim downloader."""
-    import gensim.downloader as api
-
-    return api.load("glove-wiki-gigaword-100")
-
-
-def _mean_vector(tokens: Iterable[str], kv) -> np.ndarray | None:
-    vectors = [kv[t] for t in tokens if t in kv.key_to_index]
-    if not vectors:
-        return None
-    return np.mean(np.stack(vectors), axis=0)
-
-
-def semantic_similarity_word2vec(text1: str, text2: str) -> float:
-    """Cosine similarity between mean-pooled Word2Vec embeddings of two texts.
-
-    Args:
-        text1, text2: Arbitrary strings (e.g. JD vs. tailored resume).
-
-    Returns:
-        Cosine similarity in [-1.0, 1.0]. Returns 0.0 if either text has no
-        in-vocabulary tokens.
+def semantic_similarity_tfidf(text1: str, text2: str) -> float:
     """
-    kv = _load_word2vec()
-    tokens1 = _content_tokens(text1)
-    tokens2 = _content_tokens(text2)
-
-    v1 = _mean_vector(tokens1, kv)
-    v2 = _mean_vector(tokens2, kv)
-    if v1 is None or v2 is None:
-        return 0.0
-
-    denom = float(np.linalg.norm(v1) * np.linalg.norm(v2))
-    if denom == 0.0:
-        return 0.0
-    return float(np.dot(v1, v2) / denom)
+    Compute semantic similarity between two texts using TF-IDF
+    and cosine similarity. Replaces Word2Vec for cloud compatibility.
+    """
+    vectorizer = TfidfVectorizer()
+    tfidf = vectorizer.fit_transform([text1, text2])
+    score = cosine_similarity(tfidf[0], tfidf[1])[0][0]
+    return round(float(score), 4)
