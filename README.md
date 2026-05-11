@@ -6,7 +6,7 @@ Built with Claude (Anthropic), Adzuna API, and Greenhouse API.
 
 ## Live Demo
 
-[Add your Streamlit Cloud URL here after deployment]
+https://resumatchs.streamlit.app/
 
 ## Features
 
