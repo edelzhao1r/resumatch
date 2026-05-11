@@ -40,3 +40,6 @@ resumatch_run.log
 
 # Data files with personal info
 data/sample_resumes/
+
+# Evaluation cache (regeneratable from API; contains generated resume text)
+evaluation/cache.json
