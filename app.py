@@ -764,6 +764,11 @@ if tailoring_mode == "Aggressive":
 # ============================================================
 section_header("Step 2: Choose how to find jobs")
 
+st.info(
+    "To avoid API rate limits, ResuMatch processes up to 5 job matches per "
+    "search. Results typically take 3-5 minutes to generate."
+)
+
 
 def _run(mode: str, **kwargs) -> None:
     """Shared runner — clears prior state and renders the structured progress

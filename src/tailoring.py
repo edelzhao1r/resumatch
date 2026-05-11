@@ -165,6 +165,9 @@ def tailor_resume(
 
     client = Anthropic(api_key=api_key)
 
+    # Cap input tokens — Streamlit Cloud rate-limit safeguard.
+    resume_text = resume_text[:3000]
+
     description = job.get("description", "") or ""
     if len(description) > 1500:
         description = description[:1500] + "..."
@@ -270,6 +273,9 @@ def analyze_match(resume_text: str, job: dict[str, Any]) -> dict[str, Any]:
         )
 
     client = Anthropic(api_key=api_key)
+
+    # Cap input tokens — Streamlit Cloud rate-limit safeguard.
+    resume_text = resume_text[:3000]
 
     description = job.get("description", "") or ""
     if len(description) > 1500:
@@ -600,6 +606,10 @@ def track_resume_changes(
         )
 
     client = Anthropic(api_key=api_key)
+
+    # Cap input tokens — Streamlit Cloud rate-limit safeguard.
+    original_text = original_text[:3000]
+    tailored_text = tailored_text[:3000]
 
     description = job.get("description", "") or ""
     if len(description) > 800:

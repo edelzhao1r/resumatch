@@ -90,8 +90,8 @@ TOOLS = [
                 },
                 "num_results": {
                     "type": "integer",
-                    "description": "How many jobs to return (1–20).",
-                    "default": 10,
+                    "description": "How many jobs to return (1–10).",
+                    "default": 5,
                 },
             },
             "required": ["keyword", "location"],
@@ -231,7 +231,7 @@ def _dispatch_tool(
     if tool_name == "search_jobs_adzuna":
         kw = args.get("keyword", "")
         loc = args.get("location", "") or "us"
-        n = int(args.get("num_results", 10))
+        n = int(args.get("num_results", 5))
         _log(log_callback, f"  → search_jobs_adzuna(keyword={kw!r}, location={loc!r}, n={n})")
         try:
             jobs = search_jobs_adzuna(kw, loc, num_results=n)
@@ -364,7 +364,7 @@ def run_agent(
                 accumulated_jobs = search_jobs_adzuna(
                     kwargs.get("keyword", ""),
                     kwargs.get("location") or "us",
-                    num_results=10,
+                    num_results=5,
                 )
             elif mode == "greenhouse":
                 kf = kwargs.get("keyword_filter", "")
@@ -416,7 +416,7 @@ def run_agent(
                     f"returning all {len(deduped)} unfiltered results.",
                 )
 
-    top_jobs = deduped[:10]
+    top_jobs = deduped[:5]
     tailored_resumes: list[dict[str, Any]] = []
     match_analyses: list[dict[str, Any]] = []
     jd_insights: list[dict[str, Any]] = []
@@ -427,7 +427,7 @@ def run_agent(
         company = job.get("company", "")
 
         _log(log_callback, f"Tailoring resume {i}/{len(top_jobs)} for {title} @ {company} (mode={tailoring_mode})...")
-        time.sleep(4)
+        time.sleep(6)
         try:
             tailored = tailor_resume(resume_text, job, tailoring_mode=tailoring_mode)
         except Exception as exc:
@@ -436,7 +436,7 @@ def run_agent(
         tailored_resumes.append({"job": job, "tailored": tailored})
 
         _log(log_callback, f"Analyzing match {i}/{len(top_jobs)} for {title} @ {company}...")
-        time.sleep(4)
+        time.sleep(6)
         try:
             analysis = analyze_match(resume_text, job)
         except Exception as exc:
@@ -445,7 +445,7 @@ def run_agent(
         match_analyses.append(analysis)
 
         _log(log_callback, f"Extracting JD insights {i}/{len(top_jobs)} for {title} @ {company}...")
-        time.sleep(3)
+        time.sleep(6)
         try:
             insights = extract_jd_insights(job)
         except Exception as exc:
@@ -461,7 +461,7 @@ def run_agent(
         jd_insights.append(insights)
 
         _log(log_callback, f"Tracking resume changes {i}/{len(top_jobs)} for {title} @ {company}...")
-        time.sleep(3)
+        time.sleep(6)
         print(f"Calling track_resume_changes for job {i}: {job.get('title', '')}")
         try:
             change_tracking_result = track_resume_changes(

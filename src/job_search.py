@@ -30,7 +30,7 @@ ADZUNA_BASE_URL = "https://api.adzuna.com/v1/api/jobs/us/search/1"
 def search_jobs_adzuna(
     keyword: str,
     location: str,
-    num_results: int = 10,
+    num_results: int = 5,
 ) -> list[dict[str, Any]]:
     """Search the Adzuna US job index.
 
